@@ -183,8 +183,8 @@ El ejecutable se generará en la carpeta `dist/`.
 
 ## Autor
 
-[Nombre del Desarrollador]  
-Instituto - Desarrollo de Interfaces  
+Daniel Gómez
+Desarrollo de aplicaciones multiplataforma
 Versión 1.0 - Enero 2026
 
 ## Licencia
