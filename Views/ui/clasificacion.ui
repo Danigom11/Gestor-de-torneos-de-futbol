@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>ClasificacionPage</class>
+    <widget class="QWidget" name="ClasificacionPage">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1000</width>
+                <height>700</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Clasificación</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_main">
+            <item>
+                <widget class="QLabel" name="lbl_titulo">
+                    <property name="text">
+                        <string>Cuadro de Clasificación</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QFrame" name="frame_bracket">
+                    <property name="frameShape">
+                        <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_bracket">
+                        <item>
+                            <widget class="QLabel" name="label_bracket_info">
+                                <property name="text">
+                                    <string>Bracket de eliminatorias (se dibujará dinámicamente)</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>Qt::AlignCenter</set>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <widget class="QPushButton" name="btn_actualizar">
+                    <property name="text">
+                        <string>Actualizar Clasificación</string>
+                    </property>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources />
+    <connections />
+</ui>

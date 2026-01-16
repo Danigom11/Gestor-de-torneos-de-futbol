@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>CalendarioPage</class>
+    <widget class="QWidget" name="CalendarioPage">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1000</width>
+                <height>700</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Calendario</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_main">
+            <item>
+                <widget class="QLabel" name="lbl_titulo">
+                    <property name="text">
+                        <string>Calendario de Partidos</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QSplitter" name="splitter">
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QFrame" name="panel_izquierdo">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_izq">
+                            <item>
+                                <widget class="QLabel" name="label_calendario">
+                                    <property name="text">
+                                        <string>Selecciona una fecha</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QCalendarWidget" name="calendario" />
+                            </item>
+                            <item>
+                                <spacer name="verticalSpacer">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QFrame" name="panel_derecho">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_der">
+                            <item>
+                                <widget class="QLabel" name="label_partidos">
+                                    <property name="text">
+                                        <string>Partidos</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QListWidget" name="lista_partidos" />
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources />
+    <connections />
+</ui>

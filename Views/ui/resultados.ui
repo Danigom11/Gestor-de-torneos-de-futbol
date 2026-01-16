@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>ResultadosPage</class>
+    <widget class="QWidget" name="ResultadosPage">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1000</width>
+                <height>700</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Resultados</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_main">
+            <item>
+                <widget class="QLabel" name="lbl_titulo">
+                    <property name="text">
+                        <string>Actualización de Resultados</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QSplitter" name="splitter">
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QFrame" name="panel_izquierdo">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_izq">
+                            <item>
+                                <widget class="QLabel" name="label_partidos">
+                                    <property name="text">
+                                        <string>Partidos</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QListWidget" name="lista_partidos" />
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="resumen">
+                                    <property name="text">
+                                        <string>(Resumen del partido aparecerá aquí)</string>
+                                    </property>
+                                    <property name="wordWrap">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QFrame" name="panel_derecho">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_der">
+                            <item>
+                                <widget class="QLabel" name="label_instruccion">
+                                    <property name="text">
+                                        <string>Selecciona un partido de la lista</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QScrollArea" name="scroll_equipos">
+                                    <property name="widgetResizable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <widget class="QWidget" name="scrollAreaWidgetContents">
+                                        <layout class="QHBoxLayout" name="horizontalLayout_scroll">
+                                            <item>
+                                                <widget class="QFrame" name="frame_local">
+                                                    <property name="frameShape">
+                                                        <enum>QFrame::StyledPanel</enum>
+                                                    </property>
+                                                    <layout class="QVBoxLayout"
+                                                        name="verticalLayout_local">
+                                                        <item>
+                                                            <widget class="QLabel"
+                                                                name="label_local">
+                                                                <property name="text">
+                                                                    <string>Equipo Local</string>
+                                                                </property>
+                                                                <property name="alignment">
+                                                                    <set>Qt::AlignCenter</set>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QFrame" name="frame_visitante">
+                                                    <property name="frameShape">
+                                                        <enum>QFrame::StyledPanel</enum>
+                                                    </property>
+                                                    <layout class="QVBoxLayout"
+                                                        name="verticalLayout_visitante">
+                                                        <item>
+                                                            <widget class="QLabel"
+                                                                name="label_visitante">
+                                                                <property name="text">
+                                                                    <string>Equipo Visitante</string>
+                                                                </property>
+                                                                <property name="alignment">
+                                                                    <set>Qt::AlignCenter</set>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </widget>
+                                            </item>
+                                        </layout>
+                                    </widget>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btn_guardar">
+                                    <property name="text">
+                                        <string>Guardar Resultado</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources />
+    <connections />
+</ui>

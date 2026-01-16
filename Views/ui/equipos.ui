@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>EquiposPage</class>
+    <widget class="QWidget" name="EquiposPage">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1000</width>
+                <height>700</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Equipos</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_main">
+            <item>
+                <widget class="QLabel" name="lbl_titulo">
+                    <property name="text">
+                        <string>Gestión de Equipos</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QSplitter" name="splitter">
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QFrame" name="panel_izquierdo">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>QFrame::Raised</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_izq">
+                            <item>
+                                <widget class="QLabel" name="label_nombre">
+                                    <property name="text">
+                                        <string>Nombre</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLineEdit" name="txt_nombre" />
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_curso">
+                                    <property name="text">
+                                        <string>Curso</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QComboBox" name="combo_curso">
+                                    <property name="editable">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_color">
+                                    <property name="text">
+                                        <string>Color</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget name="btn_color" class="QPushButton">
+                                    <property name="text">
+                                        <string>Seleccionar Color</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_escudo">
+                                    <property name="text">
+                                        <string>Escudo</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget name="btn_escudo" class="QPushButton">
+                                    <property name="text">
+                                        <string>Seleccionar Escudo</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QFrame" name="tarjeta_preview">
+                                    <property name="frameShape">
+                                        <enum>QFrame::StyledPanel</enum>
+                                    </property>
+                                    <layout class="QVBoxLayout" name="verticalLayout_preview">
+                                        <item>
+                                            <widget class="QLabel" name="lbl_preview_nombre">
+                                                <property name="text">
+                                                    <string>Nombre del equipo</string>
+                                                </property>
+                                                <property name="alignment">
+                                                    <set>Qt::AlignCenter</set>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QLabel" name="lbl_preview_curso">
+                                                <property name="text">
+                                                    <string>Curso</string>
+                                                </property>
+                                                <property name="alignment">
+                                                    <set>Qt::AlignCenter</set>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btn_registrar">
+                                    <property name="text">
+                                        <string>Registrar</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QFrame" name="panel_derecho">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>QFrame::Raised</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_der">
+                            <item>
+                                <widget class="QLabel" name="label_filtro">
+                                    <property name="text">
+                                        <string>Filtrar</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLineEdit" name="txt_filtro" />
+                            </item>
+                            <item>
+                                <widget class="QListWidget" name="lista_equipos" />
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources />
+    <connections />
+</ui>

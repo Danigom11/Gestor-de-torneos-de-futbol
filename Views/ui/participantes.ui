@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>ParticipantesPage</class>
+    <widget class="QWidget" name="ParticipantesPage">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1000</width>
+                <height>700</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Participantes</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_main">
+            <item>
+                <widget class="QLabel" name="lbl_titulo">
+                    <property name="text">
+                        <string>Gestión de Participantes</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QSplitter" name="splitter">
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QFrame" name="panel_izquierdo">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_izq">
+                            <item>
+                                <widget class="QLabel" name="label_nombre">
+                                    <property name="text">
+                                        <string>Nombre</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLineEdit" name="txt_nombre" />
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_fecha">
+                                    <property name="text">
+                                        <string>Fecha nacimiento</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QDateEdit" name="fecha">
+                                    <property name="calendarPopup">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_curso">
+                                    <property name="text">
+                                        <string>Curso</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QComboBox" name="combo_curso">
+                                    <property name="editable">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_tipo">
+                                    <property name="text">
+                                        <string>Tipo</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="rb_jugador">
+                                    <property name="text">
+                                        <string>Jugador</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="rb_arbitro">
+                                    <property name="text">
+                                        <string>Árbitro</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="rb_ambos">
+                                    <property name="text">
+                                        <string>Ambos</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btn_continuar">
+                                    <property name="text">
+                                        <string>Continuar</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <spacer name="verticalSpacer">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QFrame" name="panel_derecho">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_der">
+                            <item>
+                                <widget class="QLabel" name="label_posicion">
+                                    <property name="text">
+                                        <string>Posición</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QComboBox" name="combo_posicion" />
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_lista">
+                                    <property name="text">
+                                        <string>Lista de Participantes</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QListWidget" name="lista_participantes" />
+                            </item>
+                            <item>
+                                <layout class="QHBoxLayout" name="horizontalLayout_botones">
+                                    <item>
+                                        <widget class="QPushButton" name="btn_volver">
+                                            <property name="text">
+                                                <string>Volver</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="btn_registrar">
+                                            <property name="text">
+                                                <string>Registrar</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources />
+    <connections />
+</ui>
