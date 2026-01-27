@@ -308,370 +308,67 @@ class MainWindow(QMainWindow):
 
     def _crear_pagina_reloj(self):
         """
-        Crea la página del reloj digital con panel de control completo.
-
-        Returns:
-            QWidget: Página con el reloj y controles
+        Crea la página del reloj digital.
+        El componente RelojDigital ahora incluye su propio panel de control.
         """
-        from reloj_digital import RelojDigital, Mode
-        from PySide6.QtWidgets import (
-            QSizePolicy,
-            QPushButton,
-            QComboBox,
-            QSpinBox,
-            QLineEdit,
-            QCheckBox,
-            QGroupBox,
-            QFormLayout,
-            QGridLayout,
-        )
+        from reloj_digital import RelojDigital
+        from PySide6.QtWidgets import QHBoxLayout
 
         # Widget contenedor
         contenedor = QWidget()
         contenedor.setAttribute(Qt.WA_TranslucentBackground, True)
         contenedor.setStyleSheet("background: transparent;")
 
-        # Layout principal horizontal (reloj + panel)
-        layout_principal = QHBoxLayout(contenedor)
-        layout_principal.setContentsMargins(20, 20, 20, 20)
-        layout_principal.setSpacing(20)
+        # Layout principal para centrarlo
+        layout_vertical = QVBoxLayout(contenedor)
+        
+        # Espaciador superior
+        layout_vertical.addStretch()
 
-        # === RELOJ (lado izquierdo) ===
+        # Layout horizontal para centrar horizontalmente
+        layout_horizontal = QHBoxLayout()
+        layout_horizontal.addStretch()
+        
+        # Crear reloj (que incluye panel)
         self.reloj_digital = RelojDigital()
-        self.reloj_digital.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # Darle un tamaño fijo o máximo para que no se estire demasiado si no es necesario,
+        # aunque el componente es responsivo.
+        self.reloj_digital.setMinimumWidth(800)
+        
+        # Conectar señal de alarma para cumplir requisito de integración
         self.reloj_digital.alarmTriggered.connect(self._on_alarm_triggered)
-        self.reloj_digital.timerFinished.connect(self._on_timer_finished)
-        self.reloj_digital.stopwatchUpdated.connect(self._on_stopwatch_updated)
-        layout_principal.addWidget(self.reloj_digital, 3)  # 75% del espacio
-
-        # === PANEL DE CONTROL (lado derecho) ===
-        panel = QWidget()
-        panel.setStyleSheet(
-            """
-            QWidget {
-                background-color: rgba(255, 255, 255, 230);
-                border-radius: 15px;
-            }
-            QGroupBox {
-                background-color: rgba(200, 200, 200, 100);
-                border: 2px solid rgba(0, 0, 0, 100);
-                border-radius: 10px;
-                margin-top: 10px;
-                padding: 10px;
-                font-weight: bold;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
-            }
-            QPushButton {
-                background-color: #3498db;
-                color: white;
-                border: none;
-                padding: 8px;
-                border-radius: 5px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #2980b9;
-            }
-            QPushButton:pressed {
-                background-color: #21618c;
-            }
-        """
-        )
-        layout_panel = QVBoxLayout(panel)
-        layout_panel.setSpacing(15)
-
-        # --- SELECTOR DE MODO ---
-        group_modo = QGroupBox("Modo de Funcionamiento")
-        layout_modo = QVBoxLayout(group_modo)
-
-        self.combo_modo = QComboBox()
-        self.combo_modo.addItem("🕐 Reloj", Mode.CLOCK)
-        self.combo_modo.addItem("⏱️ Temporizador", Mode.TIMER)
-        self.combo_modo.addItem("⏰ Cronómetro", Mode.STOPWATCH)
-        self.combo_modo.currentIndexChanged.connect(self._on_mode_changed)
-        layout_modo.addWidget(self.combo_modo)
-
-        self.check_24h = QCheckBox("Formato 24 horas")
-        self.check_24h.setChecked(True)
-        self.check_24h.stateChanged.connect(
-            lambda: setattr(
-                self.reloj_digital, "is_24_hour", self.check_24h.isChecked()
-            )
-        )
-        layout_modo.addWidget(self.check_24h)
-
-        layout_panel.addWidget(group_modo)
-
-        # --- ALARMA ---
-        self.group_alarma = QGroupBox("⏰ Configuración de Alarma")
-        layout_alarma = QFormLayout(self.group_alarma)
-
-        self.check_alarma = QCheckBox("Activar alarma")
-        self.check_alarma.stateChanged.connect(
-            lambda: setattr(
-                self.reloj_digital, "alarm_enabled", self.check_alarma.isChecked()
-            )
-        )
-        layout_alarma.addRow(self.check_alarma)
-
-        self.spin_hora_alarma = QSpinBox()
-        self.spin_hora_alarma.setRange(0, 23)
-        self.spin_hora_alarma.valueChanged.connect(
-            lambda v: setattr(self.reloj_digital, "alarm_hour", v)
-        )
-        self.lbl_hora_alarma = QLabel("Hora:")
-        layout_alarma.addRow(self.lbl_hora_alarma, self.spin_hora_alarma)
-
-        self.spin_minuto_alarma = QSpinBox()
-        self.spin_minuto_alarma.setRange(0, 59)
-        self.spin_minuto_alarma.valueChanged.connect(
-            lambda v: setattr(self.reloj_digital, "alarm_minute", v)
-        )
-        self.lbl_minuto_alarma = QLabel("Minuto:")
-        layout_alarma.addRow(self.lbl_minuto_alarma, self.spin_minuto_alarma)
-
-        self.txt_mensaje_alarma = QLineEdit()
-        self.txt_mensaje_alarma.setText("¡Alarma activada!")
-        self.txt_mensaje_alarma.textChanged.connect(
-            lambda t: setattr(self.reloj_digital, "alarm_message", t)
-        )
-        self.lbl_mensaje_alarma = QLabel("Mensaje:")
-        layout_alarma.addRow(self.lbl_mensaje_alarma, self.txt_mensaje_alarma)
-
-        layout_panel.addWidget(self.group_alarma)
-
-        # --- TEMPORIZADOR ---
-        self.group_timer = QGroupBox("⏱️ Temporizador")
-        layout_timer = QFormLayout(self.group_timer)
-
-        self.spin_duracion = QSpinBox()
-        self.spin_duracion.setRange(1, 7200)
-        self.spin_duracion.setValue(60)
-        self.spin_duracion.setSuffix(" seg")
-        self.spin_duracion.valueChanged.connect(
-            lambda v: setattr(self.reloj_digital, "timer_duration", v)
-        )
-        self.lbl_duracion = QLabel("Duración:")
-        layout_timer.addRow(self.lbl_duracion, self.spin_duracion)
-
-        layout_btns_timer = QGridLayout()
-        self.btn_timer_start = QPushButton("▶ Iniciar")
-        self.btn_timer_start.clicked.connect(self.reloj_digital.start_timer)
-        layout_btns_timer.addWidget(self.btn_timer_start, 0, 0)
-
-        self.btn_timer_pause = QPushButton("⏸ Pausar")
-        self.btn_timer_pause.clicked.connect(self.reloj_digital.pause_timer)
-        layout_btns_timer.addWidget(self.btn_timer_pause, 0, 1)
-
-        self.btn_timer_reset = QPushButton("↻ Reiniciar")
-        self.btn_timer_reset.clicked.connect(self.reloj_digital.reset_timer)
-        layout_btns_timer.addWidget(self.btn_timer_reset, 1, 0, 1, 2)
-
-        layout_timer.addRow(layout_btns_timer)
-        layout_panel.addWidget(self.group_timer)
-
-        # --- CRONÓMETRO ---
-        self.group_stopwatch = QGroupBox("⏰ Cronómetro")
-        layout_stopwatch = QVBoxLayout(self.group_stopwatch)
-
-        layout_btns_stopwatch = QGridLayout()
-        self.btn_stopwatch_start = QPushButton("▶ Iniciar")
-        self.btn_stopwatch_start.clicked.connect(self.reloj_digital.start_stopwatch)
-        layout_btns_stopwatch.addWidget(self.btn_stopwatch_start, 0, 0)
-
-        self.btn_stopwatch_pause = QPushButton("⏸ Pausar")
-        self.btn_stopwatch_pause.clicked.connect(self.reloj_digital.pause_stopwatch)
-        layout_btns_stopwatch.addWidget(self.btn_stopwatch_pause, 0, 1)
-
-        self.btn_stopwatch_reset = QPushButton("↻ Reiniciar")
-        self.btn_stopwatch_reset.clicked.connect(self.reloj_digital.reset_stopwatch)
-        layout_btns_stopwatch.addWidget(self.btn_stopwatch_reset, 1, 0, 1, 2)
-
-        layout_stopwatch.addLayout(layout_btns_stopwatch)
-        layout_panel.addWidget(self.group_stopwatch)
-
-        # --- SELECTOR DE IDIOMA ---
-        group_idioma = QGroupBox("🌐 Idioma / Language")
-        layout_idioma = QVBoxLayout(group_idioma)
-
-        self.combo_idioma = QComboBox()
-        self.combo_idioma.setMinimumHeight(35)
-        self.combo_idioma.setStyleSheet(
-            """
-            QComboBox {
-                padding: 5px;
-                font-size: 12pt;
-                background-color: white;
-            }
-            QComboBox::drop-down {
-                width: 30px;
-            }
-            QComboBox QAbstractItemView {
-                background-color: white;
-                selection-background-color: #3498db;
-                font-size: 12pt;
-                padding: 5px;
-            }
-        """
-        )
-        self.combo_idioma.addItem("🇪🇸 Español", "es")
-        self.combo_idioma.addItem("🇬🇧 English", "en")
-        self.combo_idioma.currentIndexChanged.connect(self._on_language_changed)
-        layout_idioma.addWidget(self.combo_idioma)
-
-        layout_panel.addWidget(group_idioma)
-
-        # Espaciador
-        layout_panel.addStretch()
-
-        layout_principal.addWidget(panel, 1)  # 25% del espacio
-
-        # Guardar referencias a widgets para traducción
-        self._texts = {
-            "group_modo": group_modo,
-            "check_24h": self.check_24h,
-            "group_alarma": self.group_alarma,
-            "check_alarma": self.check_alarma,
-            "group_timer": self.group_timer,
-            "group_stopwatch": self.group_stopwatch,
-        }
-
-        # Configurar visibilidad inicial
-        self._on_mode_changed(0)
-
-        # Guardar referencia a Mode para usar en métodos
-        self._Mode = Mode
+        
+        layout_horizontal.addWidget(self.reloj_digital)
+        layout_horizontal.addStretch()
+        
+        layout_vertical.addLayout(layout_horizontal)
+        
+        # Espaciador inferior
+        layout_vertical.addStretch()
 
         return contenedor
-
-    def _on_mode_changed(self, index):
-        """Cambia el modo del reloj y actualiza visibilidad de controles."""
-        from reloj_digital import Mode
-
-        mode = self.combo_modo.itemData(index)
-        self.reloj_digital.mode = mode
-
-        # Mostrar/ocultar grupos según el modo
-        self.group_alarma.setVisible(mode == Mode.CLOCK)
-        self.group_timer.setVisible(mode == Mode.TIMER)
-        self.group_stopwatch.setVisible(mode == Mode.STOPWATCH)
-        self.check_24h.setVisible(mode == Mode.CLOCK)
-
-    def _on_stopwatch_updated(self, elapsed_seconds):
-        """Maneja la actualización del cronómetro."""
-        # Se puede usar para mostrar información adicional si se necesita
-        pass
-
-    def _on_language_changed(self, index):
-        """Cambia el idioma solo en la ventana del reloj."""
-        lang_code = self.combo_idioma.itemData(index)
-
-        # Actualizar textos según el idioma
-        if lang_code == "es":
-            self._apply_spanish_texts()
-        else:
-            self._apply_english_texts()
-
-    def _apply_spanish_texts(self):
-        """Aplica textos en español a la interfaz del reloj."""
-        # Títulos de grupos
-        self._texts["group_modo"].setTitle("Modo de Funcionamiento")
-        self._texts["check_24h"].setText("Formato 24 horas")
-        self._texts["group_alarma"].setTitle("⏰ Configuración de Alarma")
-        self._texts["check_alarma"].setText("Activar alarma")
-        self._texts["group_timer"].setTitle("⏱️ Temporizador")
-        self._texts["group_stopwatch"].setTitle("⏰ Cronómetro")
-
-        # Combo de modo
-        self.combo_modo.setItemText(0, "🕐 Reloj")
-        self.combo_modo.setItemText(1, "⏱️ Temporizador")
-        self.combo_modo.setItemText(2, "⏰ Cronómetro")
-
-        # Labels de formulario
-        self.lbl_hora_alarma.setText("Hora:")
-        self.lbl_minuto_alarma.setText("Minuto:")
-        self.lbl_mensaje_alarma.setText("Mensaje:")
-        self.lbl_duracion.setText("Duración:")
-
-        # Botones del temporizador
-        self.btn_timer_start.setText("▶ Iniciar")
-        self.btn_timer_pause.setText("⏸ Pausar")
-        self.btn_timer_reset.setText("↻ Reiniciar")
-
-        # Botones del cronómetro
-        self.btn_stopwatch_start.setText("▶ Iniciar")
-        self.btn_stopwatch_pause.setText("⏸ Pausar")
-        self.btn_stopwatch_reset.setText("↻ Reiniciar")
-
-        # Sufijo del spinbox
-        self.spin_duracion.setSuffix(" seg")
-
-        # Actualizar mensaje de alarma si está en inglés
-        if self.txt_mensaje_alarma.text() == "Alarm triggered!":
-            self.txt_mensaje_alarma.setText("¡Alarma activada!")
-
-    def _apply_english_texts(self):
-        """Aplica textos en inglés a la interfaz del reloj."""
-        # Títulos de grupos
-        self._texts["group_modo"].setTitle("Operating Mode")
-        self._texts["check_24h"].setText("24-hour format")
-        self._texts["group_alarma"].setTitle("⏰ Alarm Settings")
-        self._texts["check_alarma"].setText("Enable alarm")
-        self._texts["group_timer"].setTitle("⏱️ Timer")
-        self._texts["group_stopwatch"].setTitle("⏰ Stopwatch")
-
-        # Combo de modo
-        self.combo_modo.setItemText(0, "🕐 Clock")
-        self.combo_modo.setItemText(1, "⏱️ Timer")
-        self.combo_modo.setItemText(2, "⏰ Stopwatch")
-
-        # Labels de formulario
-        self.lbl_hora_alarma.setText("Hour:")
-        self.lbl_minuto_alarma.setText("Minute:")
-        self.lbl_mensaje_alarma.setText("Message:")
-        self.lbl_duracion.setText("Duration:")
-
-        # Botones del temporizador
-        self.btn_timer_start.setText("▶ Start")
-        self.btn_timer_pause.setText("⏸ Pause")
-        self.btn_timer_reset.setText("↻ Reset")
-
-        # Botones del cronómetro
-        self.btn_stopwatch_start.setText("▶ Start")
-        self.btn_stopwatch_pause.setText("⏸ Pause")
-        self.btn_stopwatch_reset.setText("↻ Reset")
-
-        # Sufijo del spinbox
-        self.spin_duracion.setSuffix(" sec")
-
-        # Actualizar mensaje de alarma si está en español
-        if self.txt_mensaje_alarma.text() == "¡Alarma activada!":
-            self.txt_mensaje_alarma.setText("Alarm triggered!")
-
-        # Actualizar texto del reloj si tiene alarma configurada
-        if self.reloj_digital.alarm_message == "¡Alarma activada!":
-            self.reloj_digital.alarm_message = "Alarm triggered!"
 
     def _on_alarm_triggered(self, mensaje):
         """
         Maneja la señal de alarma del reloj.
+        Muestra un mensaje en la barra de estado o un popup propio de la app.
+        """
+        # Mostrar en la barra de estado (si existe) o consola
+        print(f"Alarma recibida en MainWindow: {mensaje}")
+        
+        # Opcional: Mostrar un mensaje visual en la ventana principal
+        # Por ejemplo, usar la barra de estado si la mainwindow tuviera una
+        if self.statusBar():
+             self.statusBar().showMessage(f"🔔 ALARMA: {mensaje}", 10000) # Mostrar 10 seg
+             
+        # Nota: El componente ya muestra su propio popup (QMessageBox), 
+        # así que aquí solo hacemos una indicación sutil o log para no duplicar popups intrusivos,
+        # pero demostrando que la señal llega.
 
-        Args:
-            mensaje (str): Mensaje de la alarma
-        """
-        QMessageBox.information(self, self.tr("Alarma"), mensaje)
+    # _on_mode_changed y otros métodos auxiliares ya no son necesarios aquí 
+    # porque están encapsulados en RelojDigital.
 
-    def _on_timer_finished(self):
-        """
-        Maneja la señal de finalización del temporizador.
-        """
-        QMessageBox.information(
-            self, self.tr("Temporizador"), self.tr("¡El temporizador ha finalizado!")
-        )
+
 
     def crear_menu(self):
         """

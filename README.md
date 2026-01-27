@@ -146,15 +146,25 @@ Models/torneoFutbol_sqlite.db
 - Resultados pendientes
 - Límite de jugadores alcanzado
 
-## Distribución (Ejecutable)
+## Distribución (Ejecutales)
 
-Para crear el ejecutable de Windows:
+### 1. Aplicación Principal
+
+Para crear el ejecutable de Windows de la gestión del torneo:
 
 ```bash
 pyinstaller --add-data "Models/torneoFutbol_sqlite.db;Models" --add-data "Resources;Resources" --onefile --windowed --name="GestionTorneoFutbol" main.py
 ```
 
-El ejecutable se generará en la carpeta `dist/`.
+### 2. Componente Reloj Digital
+
+Para crear el ejecutable independiente del componente Reloj Digital:
+
+```bash
+pyinstaller --add-data "Resources;Resources" --onefile --windowed --name="RelojDigital" test_reloj.py
+```
+
+Los ejecutables se generarán en la carpeta `dist/`.
 
 ## Desarrollo
 
