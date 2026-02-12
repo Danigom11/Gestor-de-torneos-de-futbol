@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="Informe_Equipos_Jugadores"
+    pageWidth="595" pageHeight="842"
+    columnWidth="535" leftMargin="30" rightMargin="30"
+    topMargin="20" bottomMargin="20"
+    uuid="a1a1a1a1-1111-2222-3333-aaaaaaaaaaaa">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="TorneoFutbol_SQLite" />
+    <property name="com.jaspersoft.studio.data.sql.tables" value="" />
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PARÁMETRO DE FILTRO
+         ══════════════════════════════════════════════════════════════════════ -->
+    <parameter name="EQUIPO_ID" class="java.lang.Long" isForPrompting="true">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CONSULTA SQL
+         ══════════════════════════════════════════════════════════════════════ -->
+    <queryString language="SQL">
+        <![CDATA[
+        SELECT
+            e.id       AS equipo_id,
+            e.nombre   AS equipo_nombre,
+            e.curso    AS equipo_curso,
+            e.color    AS equipo_color,
+            p.id       AS jugador_id,
+            p.nombre   AS jugador_nombre,
+            COALESCE(p.posicion, 'Sin posición') AS posicion,
+            COALESCE(p.goles, 0)        AS goles,
+            COALESCE(p.t_amarillas, 0)  AS t_amarillas,
+            COALESCE(p.t_rojas, 0)      AS t_rojas
+        FROM equipos e
+        LEFT JOIN jugadores_equipos je ON je.equipo_id = e.id
+        LEFT JOIN participantes p ON p.id = je.jugador_id AND p.es_jugador = 1
+        WHERE ($P{EQUIPO_ID} IS NULL OR e.id = $P{EQUIPO_ID})
+        ORDER BY e.nombre, p.nombre
+        ]]>
+    </queryString>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CAMPOS
+         ══════════════════════════════════════════════════════════════════════ -->
+    <field name="equipo_id" class="java.lang.Long" />
+    <field name="equipo_nombre" class="java.lang.String" />
+    <field name="equipo_curso" class="java.lang.String" />
+    <field name="equipo_color" class="java.lang.String" />
+    <field name="jugador_id" class="java.lang.Long" />
+    <field name="jugador_nombre" class="java.lang.String" />
+    <field name="posicion" class="java.lang.String" />
+    <field name="goles" class="java.lang.Long" />
+    <field name="t_amarillas" class="java.lang.Long" />
+    <field name="t_rojas" class="java.lang.Long" />
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         VARIABLES DE GRUPO (estadísticas por equipo)
+         ══════════════════════════════════════════════════════════════════════ -->
+    <variable name="total_goles_equipo" class="java.lang.Long"
+        resetType="Group" resetGroup="GrupoEquipo" calculation="Sum">
+        <variableExpression><![CDATA[$F{goles}]]></variableExpression>
+    </variable>
+    <variable name="total_amarillas_equipo" class="java.lang.Long"
+        resetType="Group" resetGroup="GrupoEquipo" calculation="Sum">
+        <variableExpression><![CDATA[$F{t_amarillas}]]></variableExpression>
+    </variable>
+    <variable name="total_rojas_equipo" class="java.lang.Long"
+        resetType="Group" resetGroup="GrupoEquipo" calculation="Sum">
+        <variableExpression><![CDATA[$F{t_rojas}]]></variableExpression>
+    </variable>
+    <variable name="count_jugadores" class="java.lang.Long"
+        resetType="Group" resetGroup="GrupoEquipo" calculation="Count">
+        <variableExpression><![CDATA[$F{jugador_id}]]></variableExpression>
+    </variable>
+    <variable name="max_goles" class="java.lang.Long"
+        resetType="Group" resetGroup="GrupoEquipo" calculation="Highest">
+        <variableExpression><![CDATA[$F{goles}]]></variableExpression>
+    </variable>
+    <variable name="max_tarjetas" class="java.lang.Long"
+        resetType="Group" resetGroup="GrupoEquipo" calculation="Highest">
+        <variableExpression><![CDATA[$F{t_amarillas} + $F{t_rojas}]]></variableExpression>
+    </variable>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         GRUPO POR EQUIPO
+         ══════════════════════════════════════════════════════════════════════ -->
+    <group name="GrupoEquipo">
+        <groupExpression><![CDATA[$F{equipo_nombre}]]></groupExpression>
+
+        <!-- Cabecera de grupo: nombre del equipo -->
+        <groupHeader>
+            <band height="32">
+                <rectangle>
+                    <reportElement x="0" y="2" width="535" height="28"
+                        backcolor="#1A5490" uuid="a1a10001-1111-2222-3333-aaaaaaaaaaaa" />
+                    <graphicElement>
+                        <pen lineWidth="0" />
+                    </graphicElement>
+                </rectangle>
+                <textField>
+                    <reportElement x="10" y="6" width="515" height="20"
+                        forecolor="#FFFFFF" uuid="a1a10002-1111-2222-3333-aaaaaaaaaaaa" />
+                    <textElement verticalAlignment="Middle">
+                        <font fontName="DejaVu Sans" size="11" isBold="true"
+                            pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                    </textElement>
+                    <textFieldExpression>
+                        <![CDATA[$F{equipo_nombre} + "  —  " + $F{equipo_curso}]]>
+                    </textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+
+        <!-- Pie de grupo: estadísticas y destacados -->
+        <groupFooter>
+            <band height="50">
+                <rectangle>
+                    <reportElement x="0" y="2" width="535" height="44"
+                        backcolor="#F0F4F8" uuid="a1a10003-1111-2222-3333-aaaaaaaaaaaa" />
+                    <graphicElement>
+                        <pen lineWidth="0.5" lineColor="#BDC3C7" />
+                    </graphicElement>
+                </rectangle>
+                <!-- Totales -->
+                <textField>
+                    <reportElement x="10" y="6" width="515" height="16"
+                        forecolor="#2C3E50" uuid="a1a10004-1111-2222-3333-aaaaaaaaaaaa" />
+                    <textElement>
+                        <font fontName="DejaVu Sans" size="8" isBold="true"
+                            pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                    </textElement>
+                    <textFieldExpression><![CDATA[
+                        "Total Goles: " + $V{total_goles_equipo}
+                        + "  |  Total Tarjetas: "
+                        + ($V{total_amarillas_equipo} + $V{total_rojas_equipo})
+                        + " (" + $V{total_amarillas_equipo} + " amarillas / "
+                        + $V{total_rojas_equipo} + " rojas)"
+                        + "  |  Promedio goles/jugador: "
+                        + ($V{count_jugadores} > 0
+                            ? new java.text.DecimalFormat("#0.00").format(
+                                (double)$V{total_goles_equipo} / $V{count_jugadores})
+                            : "0")
+                    ]]></textFieldExpression>
+                </textField>
+                <!-- Destacados -->
+                <textField>
+                    <reportElement x="10" y="26" width="515" height="16"
+                        forecolor="#E74C3C" uuid="a1a10005-1111-2222-3333-aaaaaaaaaaaa" />
+                    <textElement>
+                        <font fontName="DejaVu Sans" size="8" isBold="true"
+                            pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                    </textElement>
+                    <textFieldExpression><![CDATA[
+                        "★ Máx. goleador del equipo: " + $V{max_goles} + " goles"
+                        + "  |  ★ Máx. tarjetas: " + $V{max_tarjetas}
+                    ]]></textFieldExpression>
+                </textField>
+            </band>
+        </groupFooter>
+    </group>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         BANDA TÍTULO
+         ══════════════════════════════════════════════════════════════════════ -->
+    <title>
+        <band height="62">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="56"
+                    backcolor="#1A5490" uuid="a1a10010-1111-2222-3333-aaaaaaaaaaaa" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <image onErrorType="Blank">
+                <reportElement x="8" y="7" width="42" height="42"
+                    uuid="a1a10011-1111-2222-3333-aaaaaaaaaaaa" />
+                <imageExpression><![CDATA["Resources/img/fondo.jpg"]]></imageExpression>
+            </image>
+            <staticText>
+                <reportElement x="58" y="6" width="300" height="22"
+                    forecolor="#FFFFFF" uuid="a1a10012-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="16" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Torneo de Fútbol]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="58" y="30" width="300" height="18"
+                    forecolor="#FFFFFF" uuid="a1a10013-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Informe de Equipos y Jugadores]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="380" y="16" width="150" height="14"
+                    forecolor="#FFFFFF" uuid="a1a10014-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Right">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    new java.text.SimpleDateFormat("dd/MM/yyyy  HH:mm")
+                        .format(new java.util.Date())
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CABECERA DE COLUMNAS
+         ══════════════════════════════════════════════════════════════════════ -->
+    <columnHeader>
+        <band height="22">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="20"
+                    backcolor="#2C3E50" uuid="a1a10020-1111-2222-3333-aaaaaaaaaaaa" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="2" width="180" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10021-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="9" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Jugador]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="190" y="2" width="100" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10022-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="9" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Posición]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="300" y="2" width="70" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10023-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="9" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Goles]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="375" y="2" width="75" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10024-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="9" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[T. Amarillas]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="455" y="2" width="75" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10025-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="9" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[T. Rojas]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         DETALLE (una fila por jugador)
+         ══════════════════════════════════════════════════════════════════════ -->
+    <detail>
+        <band height="18">
+            <!-- fondo alterno -->
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="16"
+                    backcolor="#F0F4F8" uuid="a1a10030-1111-2222-3333-aaaaaaaaaaaa">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <!-- Jugador -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="5" y="0" width="180" height="16"
+                    uuid="a1a10031-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{jugador_nombre}]]></textFieldExpression>
+            </textField>
+            <!-- Posición -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="190" y="0" width="100" height="16"
+                    uuid="a1a10032-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{posicion}]]></textFieldExpression>
+            </textField>
+            <!-- Goles -->
+            <textField>
+                <reportElement x="300" y="0" width="70" height="16"
+                    uuid="a1a10033-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{goles}]]></textFieldExpression>
+            </textField>
+            <!-- T. Amarillas -->
+            <textField>
+                <reportElement x="375" y="0" width="75" height="16"
+                    uuid="a1a10034-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{t_amarillas}]]></textFieldExpression>
+            </textField>
+            <!-- T. Rojas -->
+            <textField>
+                <reportElement x="455" y="0" width="75" height="16"
+                    uuid="a1a10035-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{t_rojas}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PIE DE PÁGINA
+         ══════════════════════════════════════════════════════════════════════ -->
+    <pageFooter>
+        <band height="26">
+            <rectangle>
+                <reportElement x="0" y="2" width="535" height="22"
+                    backcolor="#1A5490" uuid="a1a10040-1111-2222-3333-aaaaaaaaaaaa" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="10" y="5" width="250" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10041-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Gestión Torneo de Fútbol © 2026]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="350" y="5" width="180" height="16"
+                    forecolor="#FFFFFF" uuid="a1a10042-1111-2222-3333-aaaaaaaaaaaa" />
+                <textElement textAlignment="Right">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>

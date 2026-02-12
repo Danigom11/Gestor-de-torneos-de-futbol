@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>InformesWidget</class>
+    <widget class="QWidget" name="InformesWidget">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1000</width>
+                <height>650</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Informes del Torneo</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_main">
+            <item>
+                <widget class="QLabel" name="lbl_titulo">
+                    <property name="text">
+                        <string>Informes del Torneo</string>
+                    </property>
+                    <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QSplitter" name="splitter">
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    <widget class="QFrame" name="panel_controles">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_controles">
+                            <item>
+                                <widget class="QLabel" name="lbl_selector">
+                                    <property name="text">
+                                        <string>Seleccionar Informe:</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QComboBox" name="combo_informe">
+                                    <item>
+                                        <property name="text">
+                                            <string>Equipos y Jugadores</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>Partidos y Resultados</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>Clasificación y Eliminatorias</string>
+                                        </property>
+                                    </item>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="lbl_descripcion">
+                                    <property name="text">
+                                        <string>Descripción del informe seleccionado</string>
+                                    </property>
+                                    <property name="wordWrap">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QGroupBox" name="grupo_filtros">
+                                    <property name="title">
+                                        <string>Filtros</string>
+                                    </property>
+                                    <layout class="QVBoxLayout" name="verticalLayout_filtros">
+                                        <item>
+                                            <widget class="QLabel" name="lbl_equipo">
+                                                <property name="text">
+                                                    <string>Equipo:</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QComboBox" name="combo_equipo" />
+                                        </item>
+                                        <item>
+                                            <widget class="QLabel" name="lbl_eliminatoria">
+                                                <property name="text">
+                                                    <string>Eliminatoria:</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QComboBox" name="combo_eliminatoria" />
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QGroupBox" name="grupo_ruta">
+                                    <property name="title">
+                                        <string>Ruta de Guardado</string>
+                                    </property>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_ruta">
+                                        <item>
+                                            <widget class="QLineEdit" name="txt_ruta">
+                                                <property name="readOnly">
+                                                    <bool>true</bool>
+                                                </property>
+                                                <property name="placeholderText">
+                                                    <string>Carpeta reports (por defecto)</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QPushButton" name="btn_cambiar_ruta">
+                                                <property name="text">
+                                                    <string>Cambiar</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
+                                <spacer name="verticalSpacer">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>40</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btn_generar">
+                                    <property name="text">
+                                        <string>Generar Informe PDF</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btn_abrir_pdf">
+                                    <property name="text">
+                                        <string>Abrir Último PDF</string>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QPushButton" name="btn_abrir_carpeta">
+                                    <property name="text">
+                                        <string>Abrir Carpeta Reports</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QFrame" name="panel_preview">
+                        <property name="frameShape">
+                            <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_preview">
+                            <item>
+                                <widget class="QLabel" name="lbl_preview_titulo">
+                                    <property name="text">
+                                        <string>Vista Previa / Información</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QTextBrowser" name="text_preview" />
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="lbl_estado">
+                                    <property name="text">
+                                        <string>Listo. Selecciona un informe y pulsa Generar.</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </widget>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources />
+    <connections />
+</ui>

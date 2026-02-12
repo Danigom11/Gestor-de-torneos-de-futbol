@@ -64,7 +64,7 @@
  [],
  False,
  False,
- 1769506214,
+ 1770911966,
  [('runw.exe',
    'c:\\Users\\danig\\Downloads\\DAM2\\DI\\GestionTorneoFutbol\\.venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
    'EXECUTABLE')],

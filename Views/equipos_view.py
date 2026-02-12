@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
     QDialog,
+    QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -464,6 +465,31 @@ class EquiposPage(BasePage):
         self.lista.itemClicked.connect(self._mostrar_jugadores)
         der.addWidget(self.lista, 1)
 
+        # Botón de exportación CSV
+        self.btn_exportar = QPushButton("📊 Exportar Equipos a CSV")
+        self.btn_exportar.setStyleSheet(
+            """
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                            stop:0 #00b894, stop:1 #00a381);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 16px;
+                font-weight: 700;
+                font-size: 10pt;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                            stop:0 #00a381, stop:1 #009070);
+            }
+            QPushButton:pressed { background: #009070; }
+        """
+        )
+        self.btn_exportar.setMinimumHeight(36)
+        self.btn_exportar.clicked.connect(self._exportar_csv)
+        der.addWidget(self.btn_exportar)
+
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 2)
 
@@ -630,6 +656,28 @@ class EquiposPage(BasePage):
         self._escudo_actual = None
         self._actualizar_labels()
         self._refrescar_lista()
+
+    def _exportar_csv(self):
+        """Exporta todos los equipos a un archivo CSV."""
+        ruta_archivo, _ = QFileDialog.getSaveFileName(
+            self,
+            "Guardar Equipos como CSV",
+            "equipos.csv",
+            "Archivos CSV (*.csv)",
+        )
+        if ruta_archivo:
+            if Equipo.exportar_csv(ruta_archivo):
+                msg = QMessageBox(self)
+                msg.setIcon(QMessageBox.Information)
+                msg.setWindowTitle("Exportación exitosa")
+                msg.setText(f"Equipos exportados correctamente a:\n{ruta_archivo}")
+                msg.exec()
+            else:
+                msg = QMessageBox(self)
+                msg.setIcon(QMessageBox.Warning)
+                msg.setWindowTitle("Error de exportación")
+                msg.setText("No se pudo exportar los equipos. Intente nuevamente.")
+                msg.exec()
 
     def _refrescar_lista(self):
         texto = self.txt_filtro.text().strip()

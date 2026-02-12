@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="Informe_Partidos_Resultados"
+    pageWidth="595" pageHeight="842"
+    columnWidth="535" leftMargin="30" rightMargin="30"
+    topMargin="20" bottomMargin="20"
+    uuid="b2b2b2b2-1111-2222-3333-bbbbbbbbbbbb">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="TorneoFutbol_SQLite" />
+    <property name="com.jaspersoft.studio.data.sql.tables" value="" />
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         SUBDATASET: Historial de enfrentamientos entre equipos
+         ══════════════════════════════════════════════════════════════════════ -->
+    <subDataset name="HistorialDataset" uuid="b2b2d0d0-1111-2222-3333-bbbbbbbbbbbb">
+        <queryString language="SQL">
+            <![CDATA[
+            SELECT
+                el.nombre AS local,
+                ev.nombre AS visitante,
+                p.goles_local,
+                p.goles_visitante,
+                p.eliminatoria,
+                p.fecha_hora,
+                CASE
+                    WHEN p.ganador_id = p.equipo_local_id THEN el.nombre
+                    WHEN p.ganador_id = p.equipo_visitante_id THEN ev.nombre
+                    ELSE 'Empate'
+                END AS ganador
+            FROM partidos p
+            JOIN equipos el ON el.id = p.equipo_local_id
+            JOIN equipos ev ON ev.id = p.equipo_visitante_id
+            WHERE p.jugado = 1
+            ORDER BY el.nombre, ev.nombre, p.fecha_hora
+            ]]>
+        </queryString>
+        <field name="local" class="java.lang.String" />
+        <field name="visitante" class="java.lang.String" />
+        <field name="goles_local" class="java.lang.Long" />
+        <field name="goles_visitante" class="java.lang.Long" />
+        <field name="eliminatoria" class="java.lang.String" />
+        <field name="fecha_hora" class="java.lang.String" />
+        <field name="ganador" class="java.lang.String" />
+    </subDataset>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PARÁMETRO DE FILTRO
+         ══════════════════════════════════════════════════════════════════════ -->
+    <parameter name="ELIMINATORIA" class="java.lang.String" isForPrompting="true">
+        <defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+    </parameter>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CONSULTA SQL
+         ══════════════════════════════════════════════════════════════════════ -->
+    <queryString language="SQL">
+        <![CDATA[
+        SELECT
+            p.id            AS partido_id,
+            p.fecha_hora,
+            p.eliminatoria,
+            p.jugado,
+            p.goles_local,
+            p.goles_visitante,
+            p.prorroga,
+            p.penales_local,
+            p.penales_visitante,
+            el.nombre       AS equipo_local,
+            ev.nombre       AS equipo_visitante,
+            COALESCE(a.nombre, 'Sin asignar') AS arbitro,
+            p.ganador_id
+        FROM partidos p
+        LEFT JOIN equipos el ON el.id = p.equipo_local_id
+        LEFT JOIN equipos ev ON ev.id = p.equipo_visitante_id
+        LEFT JOIN participantes a ON a.id = p.arbitro_id
+        WHERE ($P{ELIMINATORIA} IS NULL
+               OR $P{ELIMINATORIA} = ''
+               OR p.eliminatoria = $P{ELIMINATORIA})
+        ORDER BY
+            CASE p.eliminatoria
+                WHEN 'Octavos'     THEN 1
+                WHEN 'Cuartos'     THEN 2
+                WHEN 'Semifinales' THEN 3
+                WHEN 'Final'       THEN 4
+            END,
+            p.fecha_hora
+        ]]>
+    </queryString>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CAMPOS
+         ══════════════════════════════════════════════════════════════════════ -->
+    <field name="partido_id" class="java.lang.Long" />
+    <field name="fecha_hora" class="java.lang.String" />
+    <field name="eliminatoria" class="java.lang.String" />
+    <field name="jugado" class="java.lang.Long" />
+    <field name="goles_local" class="java.lang.Long" />
+    <field name="goles_visitante" class="java.lang.Long" />
+    <field name="prorroga" class="java.lang.Long" />
+    <field name="penales_local" class="java.lang.Long" />
+    <field name="penales_visitante" class="java.lang.Long" />
+    <field name="equipo_local" class="java.lang.String" />
+    <field name="equipo_visitante" class="java.lang.String" />
+    <field name="arbitro" class="java.lang.String" />
+    <field name="ganador_id" class="java.lang.Long" />
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         GRUPO POR ELIMINATORIA
+         ══════════════════════════════════════════════════════════════════════ -->
+    <group name="GrupoEliminatoria">
+        <groupExpression><![CDATA[$F{eliminatoria}]]></groupExpression>
+        <groupHeader>
+            <band height="32">
+                <rectangle>
+                    <reportElement x="0" y="2" width="535" height="28"
+                        backcolor="#1A5490" uuid="b2b20001-1111-2222-3333-bbbbbbbbbbbb" />
+                    <graphicElement>
+                        <pen lineWidth="0" />
+                    </graphicElement>
+                </rectangle>
+                <textField>
+                    <reportElement x="10" y="6" width="515" height="20"
+                        forecolor="#FFFFFF" uuid="b2b20002-1111-2222-3333-bbbbbbbbbbbb" />
+                    <textElement verticalAlignment="Middle">
+                        <font fontName="DejaVu Sans" size="11" isBold="true"
+                            pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                    </textElement>
+                    <textFieldExpression>
+                        <![CDATA["Eliminatoria: " + $F{eliminatoria}]]>
+                    </textFieldExpression>
+                </textField>
+            </band>
+        </groupHeader>
+    </group>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         BANDA TÍTULO
+         ══════════════════════════════════════════════════════════════════════ -->
+    <title>
+        <band height="62">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="56"
+                    backcolor="#1A5490" uuid="b2b20010-1111-2222-3333-bbbbbbbbbbbb" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <image onErrorType="Blank">
+                <reportElement x="8" y="7" width="42" height="42"
+                    uuid="b2b20011-1111-2222-3333-bbbbbbbbbbbb" />
+                <imageExpression><![CDATA["Resources/img/fondo.jpg"]]></imageExpression>
+            </image>
+            <staticText>
+                <reportElement x="58" y="6" width="300" height="22"
+                    forecolor="#FFFFFF" uuid="b2b20012-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="16" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Torneo de Fútbol]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="58" y="30" width="300" height="18"
+                    forecolor="#FFFFFF" uuid="b2b20013-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="10"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Informe de Partidos y Resultados]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="380" y="16" width="150" height="14"
+                    forecolor="#FFFFFF" uuid="b2b20014-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Right">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    new java.text.SimpleDateFormat("dd/MM/yyyy  HH:mm")
+                        .format(new java.util.Date())
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         CABECERA DE COLUMNAS
+         ══════════════════════════════════════════════════════════════════════ -->
+    <columnHeader>
+        <band height="22">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="20"
+                    backcolor="#2C3E50" uuid="b2b20020-1111-2222-3333-bbbbbbbbbbbb" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="3" y="2" width="75" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20021-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Fecha/Hora]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="82" y="2" width="115" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20022-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Equipo Local]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="200" y="2" width="70" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20023-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Resultado]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="274" y="2" width="115" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20024-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Equipo Visitante]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="393" y="2" width="80" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20025-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Árbitro]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="477" y="2" width="55" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20026-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Estado]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         DETALLE (una fila por partido)
+         ══════════════════════════════════════════════════════════════════════ -->
+    <detail>
+        <band height="20">
+            <!-- Fondo naranja claro para partidos pendientes -->
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="18"
+                    backcolor="#FDEBD0" uuid="b2b20030-1111-2222-3333-bbbbbbbbbbbb">
+                    <printWhenExpression><![CDATA[$F{jugado} == 0]]></printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <!-- Fondo alterno para partidos jugados -->
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="18"
+                    backcolor="#F0F4F8" uuid="b2b20031-1111-2222-3333-bbbbbbbbbbbb">
+                    <printWhenExpression>
+                        <![CDATA[$F{jugado} == 1 && $V{REPORT_COUNT} % 2 == 0]]>
+                    </printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+
+            <!-- Fecha/Hora -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="3" y="0" width="75" height="18"
+                    uuid="b2b20032-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{fecha_hora}]]></textFieldExpression>
+            </textField>
+            <!-- Local -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="82" y="0" width="115" height="18"
+                    uuid="b2b20033-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{equipo_local}]]></textFieldExpression>
+            </textField>
+            <!-- Resultado / vs -->
+            <textField>
+                <reportElement x="200" y="0" width="70" height="18"
+                    uuid="b2b20034-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    $F{jugado} == 1
+                        ? $F{goles_local} + " - " + $F{goles_visitante}
+                          + ($F{prorroga} != null && $F{prorroga} == 1 ? " (Pró.)" : "")
+                        : "vs"
+                ]]></textFieldExpression>
+            </textField>
+            <!-- Visitante -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="274" y="0" width="115" height="18"
+                    uuid="b2b20035-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{equipo_visitante}]]></textFieldExpression>
+            </textField>
+            <!-- Árbitro -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="393" y="0" width="80" height="18"
+                    uuid="b2b20036-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[$F{arbitro}]]></textFieldExpression>
+            </textField>
+            <!-- Estado -->
+            <textField>
+                <reportElement x="477" y="0" width="55" height="18"
+                    uuid="b2b20037-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    $F{jugado} == 1 ? "Jugado" : "PENDIENTE"
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PIE DE PÁGINA
+         ══════════════════════════════════════════════════════════════════════ -->
+    <pageFooter>
+        <band height="26">
+            <rectangle>
+                <reportElement x="0" y="2" width="535" height="22"
+                    backcolor="#1A5490" uuid="b2b20040-1111-2222-3333-bbbbbbbbbbbb" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="10" y="5" width="250" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20041-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Gestión Torneo de Fútbol © 2026]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="350" y="5" width="180" height="16"
+                    forecolor="#FFFFFF" uuid="b2b20042-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Right">
+                    <font fontName="DejaVu Sans" size="8"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         RESUMEN: Historial de Enfrentamientos
+         ══════════════════════════════════════════════════════════════════════ -->
+    <summary>
+        <band height="260" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="10" width="535" height="20"
+                    forecolor="#1A5490" uuid="b2b2e001-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement>
+                    <font fontName="DejaVu Sans" size="12" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Historial de Enfrentamientos]]></text>
+            </staticText>
+            <!-- Cabecera tabla historial -->
+            <rectangle>
+                <reportElement x="0" y="32" width="535" height="16"
+                    backcolor="#2C3E50" uuid="b2b2e002-1111-2222-3333-bbbbbbbbbbbb" />
+                <graphicElement>
+                    <pen lineWidth="0" />
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="33" width="110" height="14"
+                    forecolor="#FFFFFF" uuid="b2b2e003-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Local]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="120" y="33" width="60" height="14"
+                    forecolor="#FFFFFF" uuid="b2b2e004-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Resultado]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="185" y="33" width="110" height="14"
+                    forecolor="#FFFFFF" uuid="b2b2e005-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Visitante]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="300" y="33" width="80" height="14"
+                    forecolor="#FFFFFF" uuid="b2b2e006-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Eliminatoria]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="385" y="33" width="75" height="14"
+                    forecolor="#FFFFFF" uuid="b2b2e007-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Fecha]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="465" y="33" width="65" height="14"
+                    forecolor="#FFFFFF" uuid="b2b2e008-1111-2222-3333-bbbbbbbbbbbb" />
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="DejaVu Sans" size="7" isBold="true"
+                        pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                </textElement>
+                <text><![CDATA[Ganador]]></text>
+            </staticText>
+
+            <!-- Lista de historial (jr:list) -->
+            <componentElement>
+                <reportElement x="0" y="50" width="535" height="200"
+                    uuid="b2b2e010-1111-2222-3333-bbbbbbbbbbbb" />
+                <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
+                    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd"
+                    printOrder="Vertical">
+                    <datasetRun subDataset="HistorialDataset"
+                        uuid="b2b2e011-1111-2222-3333-bbbbbbbbbbbb">
+                        <connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+                    </datasetRun>
+                    <jr:listContents height="14" width="535">
+                        <textField>
+                            <reportElement x="5" y="0" width="110" height="12"
+                                uuid="b2b2e012-1111-2222-3333-bbbbbbbbbbbb" />
+                            <textElement verticalAlignment="Middle">
+                                <font fontName="DejaVu Sans" size="7"
+                                    pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{local}]]></textFieldExpression>
+                        </textField>
+                        <textField>
+                            <reportElement x="120" y="0" width="60" height="12"
+                                uuid="b2b2e013-1111-2222-3333-bbbbbbbbbbbb" />
+                            <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="DejaVu Sans" size="7" isBold="true"
+                                    pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{goles_local} + " - " + $F{goles_visitante}]]></textFieldExpression>
+                        </textField>
+                        <textField>
+                            <reportElement x="185" y="0" width="110" height="12"
+                                uuid="b2b2e014-1111-2222-3333-bbbbbbbbbbbb" />
+                            <textElement verticalAlignment="Middle">
+                                <font fontName="DejaVu Sans" size="7"
+                                    pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{visitante}]]></textFieldExpression>
+                        </textField>
+                        <textField>
+                            <reportElement x="300" y="0" width="80" height="12"
+                                uuid="b2b2e015-1111-2222-3333-bbbbbbbbbbbb" />
+                            <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="DejaVu Sans" size="7"
+                                    pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{eliminatoria}]]></textFieldExpression>
+                        </textField>
+                        <textField isBlankWhenNull="true">
+                            <reportElement x="385" y="0" width="75" height="12"
+                                uuid="b2b2e016-1111-2222-3333-bbbbbbbbbbbb" />
+                            <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="DejaVu Sans" size="6"
+                                    pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{fecha_hora}]]></textFieldExpression>
+                        </textField>
+                        <textField>
+                            <reportElement x="465" y="0" width="65" height="12"
+                                uuid="b2b2e017-1111-2222-3333-bbbbbbbbbbbb" />
+                            <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="DejaVu Sans" size="7" isBold="true"
+                                    pdfEncoding="Identity-H" isPdfEmbedded="true" />
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{ganador}]]></textFieldExpression>
+                        </textField>
+                    </jr:listContents>
+                </jr:list>
+            </componentElement>
+        </band>
+    </summary>
+
+</jasperReport>

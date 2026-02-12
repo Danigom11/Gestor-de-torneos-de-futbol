@@ -1,0 +1,14 @@
+LEEME - Driver JDBC para SQLite
+================================
+
+Para que pyreportjasper pueda conectarse a la base de datos SQLite,
+necesitas descargar el driver JDBC y colocarlo en ESTA carpeta.
+
+Descarga:
+  https://github.com/xerial/sqlite-jdbc/releases
+
+Archivo necesario:
+  sqlite-jdbc-3.x.x.jar  (ej: sqlite-jdbc-3.46.0.0.jar)
+
+Una vez descargado, coloca el .jar aquí:
+  reports/lib/sqlite-jdbc-3.x.x.jar

@@ -192,6 +192,7 @@ class MainWindow(QMainWindow):
         from Views.calendario_view import CalendarioPage
         from Views.resultados_view import ResultadosPage
         from Views.clasificacion_view import ClasificacionPage
+        from Views.informes_view import InformesPage
         from reloj_digital import RelojDigital
 
         self.paginas = {
@@ -200,6 +201,7 @@ class MainWindow(QMainWindow):
             "calendario": CalendarioPage(),
             "resultados": ResultadosPage(),
             "clasificacion": ClasificacionPage(),
+            "informes": InformesPage(),
             "reloj": self._crear_pagina_reloj(),
         }
 
@@ -293,6 +295,12 @@ class MainWindow(QMainWindow):
         tarjeta_clasificacion.clicked.connect(self.navegar_a_seccion)
         grid_tarjetas.addWidget(tarjeta_clasificacion, 1, 1)
 
+        # Tercera fila: Informes
+        ruta_informes = obtener_ruta_recurso("Resources/img/fondo.jpg")
+        tarjeta_informes = TarjetaNavegacion("Informes", ruta_informes, "informes")
+        tarjeta_informes.clicked.connect(self.navegar_a_seccion)
+        grid_tarjetas.addWidget(tarjeta_informes, 2, 0, 1, 2)  # Ocupa 2 columnas
+
         # Configurar proporciones de columnas para que sean iguales
         grid_tarjetas.setColumnStretch(0, 1)
         grid_tarjetas.setColumnStretch(1, 1)
@@ -300,6 +308,7 @@ class MainWindow(QMainWindow):
         # Configurar proporciones de filas para que sean iguales
         grid_tarjetas.setRowStretch(0, 1)
         grid_tarjetas.setRowStretch(1, 1)
+        grid_tarjetas.setRowStretch(2, 1)
 
         layout_principal.addLayout(grid_tarjetas, 1)  # stretch = 1
         layout_principal.addStretch(0)  # stretch mínimo al final
@@ -321,28 +330,28 @@ class MainWindow(QMainWindow):
 
         # Layout principal para centrarlo
         layout_vertical = QVBoxLayout(contenedor)
-        
+
         # Espaciador superior
         layout_vertical.addStretch()
 
         # Layout horizontal para centrar horizontalmente
         layout_horizontal = QHBoxLayout()
         layout_horizontal.addStretch()
-        
+
         # Crear reloj (que incluye panel)
         self.reloj_digital = RelojDigital()
         # Darle un tamaño fijo o máximo para que no se estire demasiado si no es necesario,
         # aunque el componente es responsivo.
         self.reloj_digital.setMinimumWidth(800)
-        
+
         # Conectar señal de alarma para cumplir requisito de integración
         self.reloj_digital.alarmTriggered.connect(self._on_alarm_triggered)
-        
+
         layout_horizontal.addWidget(self.reloj_digital)
         layout_horizontal.addStretch()
-        
+
         layout_vertical.addLayout(layout_horizontal)
-        
+
         # Espaciador inferior
         layout_vertical.addStretch()
 
@@ -355,20 +364,20 @@ class MainWindow(QMainWindow):
         """
         # Mostrar en la barra de estado (si existe) o consola
         print(f"Alarma recibida en MainWindow: {mensaje}")
-        
+
         # Opcional: Mostrar un mensaje visual en la ventana principal
         # Por ejemplo, usar la barra de estado si la mainwindow tuviera una
         if self.statusBar():
-             self.statusBar().showMessage(f"🔔 ALARMA: {mensaje}", 10000) # Mostrar 10 seg
-             
-        # Nota: El componente ya muestra su propio popup (QMessageBox), 
+            self.statusBar().showMessage(
+                f"🔔 ALARMA: {mensaje}", 10000
+            )  # Mostrar 10 seg
+
+        # Nota: El componente ya muestra su propio popup (QMessageBox),
         # así que aquí solo hacemos una indicación sutil o log para no duplicar popups intrusivos,
         # pero demostrando que la señal llega.
 
-    # _on_mode_changed y otros métodos auxiliares ya no son necesarios aquí 
+    # _on_mode_changed y otros métodos auxiliares ya no son necesarios aquí
     # porque están encapsulados en RelojDigital.
-
-
 
     def crear_menu(self):
         """
@@ -431,6 +440,10 @@ class MainWindow(QMainWindow):
             lambda: self.navegar_a_seccion("clasificacion")
         )
         menubar.addAction(accion_clasificacion)
+
+        accion_informes = QAction("Informes", self)
+        accion_informes.triggered.connect(lambda: self.navegar_a_seccion("informes"))
+        menubar.addAction(accion_informes)
 
         accion_reloj = QAction("Reloj", self)
         accion_reloj.triggered.connect(lambda: self.navegar_a_seccion("reloj"))
